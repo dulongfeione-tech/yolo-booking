@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LA同城约拍 · yolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Caveat:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1ede6;
+    --bg-soft: #e8e3d9;
+    --paper: #fbf8f1;
+    --ink: #1a1814;
+    --ink-soft: #4a443a;
+    --ink-fade: #8a8377;
+    --tape: #d4c8a8;
+    --pink: #f4d4d4;
+    --rust: #a04a30;
+    --line: #c8bfa8;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+
+body {
+background: var(–bg);
+color: var(–ink);
+font-family: ‘Noto Serif SC’, serif;
+min-height: 100vh;
+overflow-x: hidden;
+position: relative;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 400 400’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘3’ seed=‘5’/%3E%3CfeColorMatrix values=‘0 0 0 0 0.4 0 0 0 0 0.36 0 0 0 0 0.3 0 0 0 0.5 0’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.6’/%3E%3C/svg%3E”);
+opacity: 0.25;
+pointer-events: none;
+z-index: 0;
+mix-blend-mode: multiply;
+}
+
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(74,68,58,0.025) 3px, rgba(74,68,58,0.025) 4px);
+pointer-events: none;
+z-index: 1;
+}
+
+.page { position: relative; z-index: 2; }
+
+/* Lang Splash */
+.lang-splash {
+position: fixed; inset: 0; z-index: 1000;
+background: var(–bg);
+display: flex; align-items: center; justify-content: center;
+flex-direction: column; padding: 40px 24px;
+animation: splashFadeIn 0.6s ease;
+}
+.lang-splash::before {
+content: ‘’; position: absolute; inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 400 400’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘3’ seed=‘5’/%3E%3CfeColorMatrix values=‘0 0 0 0 0.4 0 0 0 0 0.36 0 0 0 0 0.3 0 0 0 0.5 0’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.6’/%3E%3C/svg%3E”);
+opacity: 0.25; pointer-events: none; mix-blend-mode: multiply;
+}
+@keyframes splashFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lang-splash.fade-out { animation: splashFadeOut 0.5s ease forwards; }
+@keyframes splashFadeOut { to { opacity: 0; transform: scale(1.04); } }
+
+.lang-splash-inner { position: relative; z-index: 2; text-align: center; max-width: 480px; }
+.lang-brand { font-family: ‘Noto Serif SC’, serif; font-weight: 700; font-size: clamp(40px,7vw,64px); letter-spacing: 0.02em; margin-bottom: 8px; line-height: 1; }
+.lang-yolo { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: clamp(32px,5vw,48px); color: var(–rust); margin-bottom: 12px; }
+.lang-tagline { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 16px; color: var(–ink-fade); letter-spacing: 0.15em; margin-bottom: 60px; }
+.lang-prompt { font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(–ink-fade); margin-bottom: 32px; }
+.lang-prompt::before, .lang-prompt::after { content: ’— ’; margin: 0 8px; }
+.lang-options { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.lang-btn {
+padding: 18px 40px; background: transparent; border: 1px solid var(–ink);
+cursor: pointer; font-family: ‘Noto Serif SC’, serif; font-size: 18px;
+color: var(–ink); letter-spacing: 0.05em;
+transition: all 0.3s cubic-bezier(0.2,0.8,0.2,1);
+position: relative; min-width: 160px; overflow: hidden;
+}
+.lang-btn::before {
+content: ‘’; position: absolute; inset: 0; background: var(–ink);
+transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+}
+.lang-btn:hover { color: var(–paper); }
+.lang-btn:hover::before { transform: translateY(0); }
+.lang-btn span { position: relative; z-index: 1; display: block; }
+.lang-btn .lang-name { font-weight: 600; margin-bottom: 4px; }
+.lang-btn .lang-sub { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 13px; color: var(–ink-fade); transition: color 0.2s; }
+.lang-btn:hover .lang-sub { color: rgba(251,248,241,0.7); }
+.lang-deco { position: absolute; color: var(–rust); pointer-events: none; font-family: ‘Cormorant Garamond’, serif; }
+.lang-deco.d1 { top: 15%; left: 10%; font-size: 24px; transform: rotate(-15deg); }
+.lang-deco.d2 { bottom: 18%; right: 12%; font-size: 18px; transform: rotate(20deg); color: var(–ink-fade); }
+.lang-deco.d3 { top: 22%; right: 18%; font-size: 14px; color: var(–ink-fade); }
+
+/* Header */
+header { padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: baseline; gap: 14px; }
+.brand-cn { font-family: ‘Noto Serif SC’, serif; font-weight: 600; font-size: 22px; letter-spacing: 0.05em; }
+.brand-en { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 20px; color: var(–rust); }
+
+main { padding: 20px 40px 100px; max-width: 1100px; margin: 0 auto; }
+
+/* Hero */
+.hero { position: relative; padding: 40px 0 80px; margin-bottom: 40px; }
+.hero-title { font-family: ‘Noto Serif SC’, serif; font-weight: 700; font-size: clamp(48px,7vw,88px); line-height: 1; letter-spacing: -0.01em; margin-bottom: 8px; position: relative; z-index: 3; }
+.hero-yolo { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-weight: 400; font-size: clamp(36px,5vw,64px); color: var(–ink); margin-bottom: 40px; padding-left: 30%; position: relative; z-index: 3; }
+.hero-collage { position: relative; max-width: 480px; margin: 0 auto; z-index: 2; }
+.hero-tape { position: absolute; top: -18px; left: 50%; transform: translateX(-50%) rotate(-3deg); width: 110px; height: 38px; background: rgba(212,200,168,0.7); z-index: 4; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+.hero-tape::before { content: ‘’; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0px, transparent 8px, rgba(255,255,255,0.15) 8px, rgba(255,255,255,0.15) 9px); }
+.hero-photo { width: 100%; aspect-ratio: 4/5; background-image: url(”./photo1.jpg”); background-size: cover; background-position: center top; position: relative; box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 12px 30px -12px rgba(26,24,20,0.25); border: 8px solid var(–paper); transform: rotate(-1deg); }
+.hero-poem { margin-top: 50px; text-align: center; font-family: ‘Noto Serif SC’, serif; font-size: 16px; line-height: 2.2; color: var(–ink-soft); letter-spacing: 0.05em; max-width: 500px; margin-left: auto; margin-right: auto; position: relative; z-index: 3; }
+.hero-poem .line { display: block; opacity: 0; animation: fadeIn 0.8s ease forwards; }
+.hero-poem .line:nth-child(1) { animation-delay: 0.2s; }
+.hero-poem .line:nth-child(2) { animation-delay: 0.4s; }
+.hero-poem .line:nth-child(3) { animation-delay: 0.6s; }
+.hero-poem .line:nth-child(4) { animation-delay: 0.8s; }
+.hero-poem .line:nth-child(5) { animation-delay: 1.0s; }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(8px); } }
+.deco-cross { position: absolute; color: var(–rust); font-family: ‘Cormorant Garamond’, serif; pointer-events: none; user-select: none; }
+.deco-cross.c1 { top: 100px; right: 5%; font-size: 24px; transform: rotate(15deg); }
+.deco-cross.c2 { bottom: 30%; left: 3%; font-size: 18px; transform: rotate(-10deg); color: var(–ink-fade); }
+
+/* Divider */
+.divider { display: flex; align-items: center; gap: 16px; margin: 60px 0 40px; }
+.divider::before, .divider::after { content: ‘’; flex: 1; height: 1px; background: var(–line); }
+.divider-text { font-family: ‘JetBrains Mono’, monospace; font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: var(–ink-fade); }
+
+/* Equipment */
+.equipment { display: grid; grid-template-columns: 280px 1fr; gap: 56px; align-items: center; padding: 40px 32px; background: var(–paper); margin-bottom: 60px; position: relative; border: 1px solid var(–line); }
+.equipment::before { content: ‘’; position: absolute; top: -16px; left: 50px; width: 90px; height: 32px; background: rgba(212,200,168,0.7); transform: rotate(-2deg); }
+.equipment-img { width: 100%; aspect-ratio: 4/5; background-image: url(”./photo2.jpg”); background-size: cover; background-position: center; border: 8px solid var(–paper); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.15); transform: rotate(2deg); }
+.equipment-info h3 { font-family: ‘Noto Serif SC’, serif; font-weight: 700; font-size: 26px; margin-bottom: 8px; }
+.equipment-info .model { color: var(–rust); }
+.equipment-info .en { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 14px; color: var(–ink-fade); margin-bottom: 20px; }
+.equipment-info ul { list-style: none; line-height: 2; color: var(–ink-soft); font-size: 14px; }
+.equipment-info ul li::before { content: ’○ ’; color: var(–rust); margin-right: 4px; }
+
+/* Price List */
+.pricelist-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: end; border-bottom: 2px solid var(–ink); padding-bottom: 16px; }
+.pricelist-header h2 { font-family: ‘Cormorant Garamond’, serif; font-weight: 300; font-size: 56px; line-height: 1; letter-spacing: -0.02em; }
+.pricelist-header .subtitle { font-family: ‘Noto Serif SC’, serif; font-size: 18px; color: var(–ink-soft); letter-spacing: 0.1em; }
+.package-tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid var(–line); }
+.package-tab { padding: 12px 24px; background: none; border: none; cursor: pointer; font-family: ‘Noto Serif SC’, serif; font-size: 15px; color: var(–ink-fade); position: relative; transition: color 0.2s; letter-spacing: 0.05em; }
+.package-tab:hover { color: var(–ink-soft); }
+.package-tab.active { color: var(–ink); font-weight: 600; }
+.package-tab.active::after { content: ‘’; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(–rust); }
+.packages { display: flex; flex-direction: column; gap: 0; margin-bottom: 60px; }
+.package { padding: 28px 24px; border-bottom: 1px solid var(–line); cursor: pointer; position: relative; transition: background 0.3s, padding 0.3s; }
+.package:hover { background: var(–paper); padding-left: 32px; }
+.package.selected { background: var(–ink); color: var(–paper); }
+.package.selected:hover { padding-left: 32px; }
+.package-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 20px; }
+.package-name { font-family: ‘Noto Serif SC’, serif; font-weight: 600; font-size: 24px; letter-spacing: 0.02em; }
+.package-name .duration { font-family: ‘Cormorant Garamond’, serif; font-style: italic; color: var(–rust); margin-right: 8px; font-weight: 400; }
+.package.selected .duration { color: #f4d4a8; }
+.package-price { font-family: ‘Cormorant Garamond’, serif; font-size: 32px; font-weight: 400; white-space: nowrap; }
+.package-price .single { color: var(–rust); }
+.package.selected .single { color: #f4d4a8; }
+.package-price .double { display: block; font-size: 18px; color: var(–ink-soft); margin-top: 2px; text-align: right; }
+.package.selected .double { color: rgba(251,248,241,0.6); }
+.package-features { list-style: none; font-size: 13px; line-height: 1.9; color: var(–ink-soft); padding-left: 4px; }
+.package.selected .package-features { color: rgba(251,248,241,0.75); }
+.package-features li::before { content: ’○ ’; color: var(–rust); margin-right: 2px; }
+.package.selected .package-features li::before { color: #f4d4a8; }
+.person-toggle { display: inline-flex; background: var(–bg-soft); padding: 4px; margin-top: 12px; }
+.person-toggle button { padding: 6px 16px; background: none; border: none; cursor: pointer; font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.15em; color: var(–ink-soft); transition: all 0.2s; }
+.person-toggle button.active { background: var(–ink); color: var(–paper); }
+.package.selected .person-toggle { background: rgba(251,248,241,0.1); }
+.package.selected .person-toggle button { color: rgba(251,248,241,0.7); }
+.package.selected .person-toggle button.active { background: var(–paper); color: var(–ink); }
+
+.pricelist-notes { text-align: right; font-size: 12px; color: var(–ink-soft); line-height: 2; padding: 24px 0; border-top: 1px solid var(–line); margin-bottom: 60px; }
+.pricelist-notes .star { font-family: ‘Cormorant Garamond’, serif; font-size: 16px; color: var(–rust); letter-spacing: 0.3em; margin-bottom: 8px; display: block; }
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; margin-bottom: 48px; }
+.field { margin-bottom: 28px; }
+.field label { display: block; font-family: ‘JetBrains Mono’, monospace; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(–ink-fade); margin-bottom: 8px; }
+.field input, .field textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(–line); padding: 8px 0 12px; font-family: ‘Noto Serif SC’, serif; font-size: 16px; color: var(–ink); transition: border-color 0.3s; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(–rust); }
+.field textarea { resize: vertical; min-height: 70px; }
+.loc-hint { font-family: ‘Noto Serif SC’, serif; font-size: 12px; color: var(–ink-fade); margin-top: 8px; line-height: 1.6; }
+.loc-hint.ok { color: #4a7a3a; padding: 8px 12px; background: rgba(74,122,58,0.06); border-left: 2px solid #4a7a3a; }
+
+/* DateTime */
+.datetime-block { background: var(–paper); border: 1px solid var(–line); padding: 28px; position: relative; }
+.datetime-block::before { content: ‘’; position: absolute; top: -14px; right: 30px; width: 80px; height: 26px; background: rgba(212,200,168,0.7); transform: rotate(3deg); }
+.datetime-block h3 { font-family: ‘Noto Serif SC’, serif; font-weight: 600; font-size: 22px; margin-bottom: 4px; }
+.datetime-block .sub { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 13px; color: var(–ink-fade); margin-bottom: 24px; }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.cal-month { font-family: ‘Cormorant Garamond’, serif; font-size: 20px; font-style: italic; }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav button { width: 28px; height: 28px; background: transparent; border: 1px solid var(–line); cursor: pointer; color: var(–ink-soft); transition: all 0.2s; font-size: 14px; }
+.cal-nav button:hover { border-color: var(–rust); color: var(–rust); }
+.calendar { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 24px; }
+.cal-dow { font-family: ‘JetBrains Mono’, monospace; font-size: 10px; text-align: center; color: var(–ink-fade); padding: 8px 0; letter-spacing: 0.05em; }
+.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: ‘Cormorant Garamond’, serif; font-size: 15px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; background: transparent; color: var(–ink); }
+.cal-day:hover:not(.disabled) { border-color: var(–rust); color: var(–rust); }
+.cal-day.disabled { color: var(–line); cursor: not-allowed; }
+.cal-day.selected { background: var(–ink); color: var(–paper); border-color: var(–ink); }
+.cal-day.today { font-weight: 600; position: relative; }
+.cal-day.today::after { content: ‘’; position: absolute; bottom: 3px; left: 50%; width: 3px; height: 3px; background: var(–rust); border-radius: 50%; transform: translateX(-50%); }
+.timeslots { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+.timeslot { padding: 10px; text-align: center; border: 1px solid var(–line); background: transparent; cursor: pointer; font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.05em; color: var(–ink); transition: all 0.2s; position: relative; }
+.timeslot:hover { border-color: var(–rust); color: var(–rust); }
+.timeslot.selected { background: var(–rust); color: var(–paper); border-color: var(–rust); }
+.timeslot.indoor-best { }
+.timeslot .indoor-tag { position: absolute; top: -8px; right: -4px; background: var(–pink); color: var(–ink); font-size: 8px; padding: 2px 5px; transform: rotate(4deg); }
+
+/* Submit */
+.submit-row { display: flex; justify-content: space-between; align-items: center; padding-top: 32px; border-top: 1px solid var(–line); gap: 24px; flex-wrap: wrap; }
+.summary { font-family: ‘Noto Serif SC’, serif; font-size: 15px; color: var(–ink-soft); }
+.summary strong { color: var(–rust); font-family: ‘Cormorant Garamond’, serif; font-size: 20px; font-weight: 500; }
+.btn-submit { background: var(–ink); color: var(–paper); border: none; padding: 16px 44px; font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+.btn-submit::before { content: ‘’; position: absolute; inset: 0; background: var(–rust); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+.btn-submit span { position: relative; z-index: 1; }
+.btn-submit:hover::before { transform: translateX(0); }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-submit:disabled::before { display: none; }
+
+/* Success */
+.success { text-align: center; padding: 60px 20px; }
+.success .mark { font-family: ‘Caveat’, cursive; font-size: 80px; color: var(–rust); margin-bottom: 8px; line-height: 1; }
+.success h2 { font-family: ‘Noto Serif SC’, serif; font-weight: 700; font-size: 42px; margin-bottom: 12px; }
+.success h2 em { color: var(–rust); font-family: ‘Cormorant Garamond’, serif; font-style: italic; }
+.success p { color: var(–ink-soft); font-size: 15px; line-height: 1.9; max-width: 500px; margin: 0 auto 32px; }
+.success .details { background: var(–paper); border: 1px solid var(–line); padding: 28px 32px; max-width: 480px; margin: 0 auto 32px; text-align: left; position: relative; }
+.success .details::before { content: ‘’; position: absolute; top: -14px; left: 50px; width: 90px; height: 26px; background: rgba(212,200,168,0.7); transform: rotate(-3deg); }
+.success .details .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(–line); font-size: 14px; }
+.success .details .row:last-child { border-bottom: none; }
+.success .details .row span:first-child { font-family: ‘JetBrains Mono’, monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(–ink-fade); }
+.deposit-notice { max-width: 480px; margin: 0 auto 24px; padding: 20px 24px; background: rgba(160,74,48,0.06); border: 1px dashed var(–rust); text-align: left; }
+.deposit-title { font-family: ‘Noto Serif SC’, serif; font-weight: 600; font-size: 14px; color: var(–rust); margin-bottom: 8px; letter-spacing: 0.05em; }
+.deposit-body { font-size: 13px; color: var(–ink-soft); line-height: 1.8; }
+.deposit-body strong { color: var(–rust); }
+.contact-card { max-width: 480px; margin: 0 auto; background: var(–paper); border: 1px solid var(–line); padding: 28px; text-align: left; position: relative; }
+.contact-card::before { content: ‘’; position: absolute; top: -14px; right: 40px; width: 80px; height: 26px; background: var(–pink); transform: rotate(3deg); opacity: 0.7; }
+.contact-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(–line); }
+.contact-tag { font-family: ‘JetBrains Mono’, monospace; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(–ink-fade); }
+.contact-name { font-family: ‘Cormorant Garamond’, serif; font-style: italic; font-size: 22px; color: var(–ink); }
+.contact-grid { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
+.contact-item { display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 16px; padding: 12px 14px; background: var(–bg); border: 1px solid var(–line); }
+.contact-label { font-family: ‘JetBrains Mono’, monospace; font-size: 10px; letter-spacing: 0.15em; color: var(–ink-fade); }
+.contact-value { font-family: ‘JetBrains Mono’, monospace; font-size: 14px; color: var(–ink); }
+.contact-copy { background: var(–ink); color: var(–paper); border: none; padding: 6px 14px; font-family: ‘Noto Serif SC’, serif; font-size: 12px; cursor: pointer; transition: background 0.2s; }
+.contact-copy:hover { background: var(–rust); }
+.contact-copy.copied { background: #4a7a3a; }
+.contact-cta { display: block; text-align: center; padding: 14px; background: #25D366; color: white; text-decoration: none; font-family: ‘Noto Serif SC’, serif; font-size: 14px; letter-spacing: 0.05em; transition: background 0.2s; }
+.contact-cta:hover { background: #1eaa52; }
+
+/* Music FAB */
+.music-fab { position: fixed; bottom: 24px; right: 24px; z-index: 90; width: 52px; height: 52px; border-radius: 50%; background: var(–paper); border: 1px solid var(–line); box-shadow: 0 6px 20px -6px rgba(26,24,20,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.2,0.8,0.2,1); color: var(–ink-soft); }
+.music-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -8px rgba(26,24,20,0.35); color: var(–rust); border-color: var(–rust); }
+.music-fab.playing { background: var(–ink); color: var(–paper); border-color: var(–ink); }
+.music-fab.playing::before { content: ‘’; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(–ink); opacity: 0; animation: musicPulse 2s ease-out infinite; }
+@keyframes musicPulse { 0% { transform: scale(0.95); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+.music-icon { width: 18px; height: 18px; display: flex; align-items: end; gap: 2px; justify-content: center; }
+.music-icon span { width: 2px; background: currentColor; border-radius: 1px; }
+.music-fab:not(.playing) .music-icon { width: 0; height: 0; border-left: 12px solid currentColor; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; background: none; }
+.music-fab:not(.playing) .music-icon span { display: none; }
+.music-fab.playing .music-icon span:nth-child(1) { height: 60%; animation: barJump 0.8s ease-in-out infinite; }
+.music-fab.playing .music-icon span:nth-child(2) { height: 90%; animation: barJump 0.8s ease-in-out infinite 0.15s; }
+.music-fab.playing .music-icon span:nth-child(3) { height: 50%; animation: barJump 0.8s ease-in-out infinite 0.3s; }
+.music-fab.playing .music-icon span:nth-child(4) { height: 80%; animation: barJump 0.8s ease-in-out infinite 0.45s; }
+@keyframes barJump { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+.music-tooltip { position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%) translateX(8px); background: var(–ink); color: var(–paper); padding: 8px 14px; font-family: ‘Noto Serif SC’, serif; font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+.music-tooltip::after { content: ‘’; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); border-left: 6px solid var(–ink); border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.music-fab.show-tooltip .music-tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+/* Toast */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(–ink); color: var(–paper); padding: 14px 28px; font-family: ‘JetBrains Mono’, monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; z-index: 100; transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.hidden { display: none !important; }
+
+@media (max-width: 768px) {
+header { padding: 18px 20px; }
+main { padding: 16px 20px 80px; }
+.hero-yolo { padding-left: 40%; }
+.equipment { grid-template-columns: 1fr; gap: 24px; padding: 28px 20px; }
+.equipment-img { max-width: 220px; margin: 0 auto; }
+.pricelist-header h2 { font-size: 36px; }
+.package-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+.package-price { font-size: 26px; }
+.form-grid { grid-template-columns: 1fr; gap: 36px; }
+.submit-row { flex-direction: column; align-items: stretch; }
+.contact-item { grid-template-columns: 70px 1fr auto; gap: 10px; }
+.music-fab { width: 44px; height: 44px; bottom: 16px; right: 16px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- 语言选择启动页 -->
+
+<div id="lang-splash" class="lang-splash">
+  <span class="lang-deco d1">+</span>
+  <span class="lang-deco d2">✦</span>
+  <span class="lang-deco d3">✧</span>
+  <div class="lang-splash-inner">
+    <div class="lang-brand">LA同城约拍</div>
+    <div class="lang-yolo">yolo</div>
+    <div class="lang-tagline">Capture The Moment</div>
+    <div class="lang-prompt">Choose Language · 选择语言</div>
+    <div class="lang-options">
+      <button class="lang-btn" data-lang="zh">
+        <span class="lang-name">中文</span>
+        <span class="lang-sub">Chinese</span>
+      </button>
+      <button class="lang-btn" data-lang="en">
+        <span class="lang-name">English</span>
+        <span class="lang-sub">英文</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+<header>
+  <div class="brand">
+    <span class="brand-cn" data-i18n="brand.cn">LA同城约拍</span>
+    <span class="brand-en">yolo</span>
+  </div>
+</header>
+
+<main>
+
+<!-- 客户视图 -->
+
+<div id="view-customer">
+
+  <section class="hero">
+    <span class="deco-cross c1">+</span>
+    <span class="deco-cross c2">✦</span>
+    <h1 class="hero-title" data-i18n="hero.title">LA同城约拍</h1>
+    <div class="hero-yolo">yolo</div>
+    <div class="hero-collage">
+      <div class="hero-tape"></div>
+      <div class="hero-photo"></div>
+    </div>
+    <div class="hero-poem" data-i18n-html="hero.poem">
+      <span class="line">我不只是按下快门</span>
+      <span class="line">更在意那些藏在细节里的情绪</span>
+      <span class="line">一个不经意的眼神,一句轻声的笑</span>
+      <span class="line">让每一个值得被记住的瞬间</span>
+      <span class="line">在照片里永远鲜活</span>
+    </div>
+  </section>
+
+  <div class="divider">
+    <span class="divider-text" data-i18n="divider.equipment">Equipment · 拍照设备</span>
+  </div>
+
+  <section class="equipment">
+    <div class="equipment-img"></div>
+    <div class="equipment-info">
+      <h3 data-i18n-html="equip.title">设备:<span class="model">富士 XT-5</span></h3>
+      <div class="en">FUJIFILM X-T5 · Naturally Cinematic</div>
+      <ul data-i18n-html="equip.list">
+        <li>最大程度还原自然色彩</li>
+        <li>富士滤镜直出</li>
+        <li>擅长自然感、复古风、小清新</li>
+        <li>人像拍摄</li>
+        <li>原厂 4800 万像素 33mm 中画幅镜头</li>
+        <li>18-50mm 变焦镜头,轻松驾驭各种场景</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider">
+    <span class="divider-text" data-i18n="divider.packages">Packages · 套餐</span>
+  </div>
+
+  <div class="pricelist-header">
+    <h2>Price List</h2>
+    <div class="subtitle" id="price-subtitle" data-i18n="pricelist.subtitle.portrait">约拍套餐</div>
+  </div>
+
+  <div class="package-tabs">
+    <button class="package-tab active" data-cat="portrait" data-i18n="tab.portrait">约拍套餐 / Portrait</button>
+    <button class="package-tab" data-cat="wedding" data-i18n="tab.wedding">婚礼跟拍 / Wedding</button>
+  </div>
+
+  <div class="packages" id="packages-list"></div>
+
+  <div class="pricelist-notes" data-i18n-html="notes">
+    <span class="star">注 ☆☆☆</span>
+    前两档价格不包含车费,客人需承担额外车费<br>
+    拍摄结束后 7 天左右精修完毕<br>
+    预付半价定金视为合同生效<br>
+    取消预约请提前一周
+  </div>
+
+  <div class="divider">
+    <span class="divider-text" data-i18n="divider.reserve">Reserve · 预约信息</span>
+  </div>
+
+  <div class="form-grid">
+    <div>
+      <div class="field">
+        <label data-i18n="field.name">姓名 / Name *</label>
+        <input type="text" id="f-name" data-i18n-ph="ph.name" placeholder="您的称呼">
+      </div>
+      <div class="field">
+        <label data-i18n="field.phone">电话 / Phone *</label>
+        <input type="tel" id="f-phone" data-i18n-ph="ph.phone" placeholder="便于我们联系您">
+      </div>
+      <div class="field">
+        <label data-i18n="field.email">邮箱 / Email *</label>
+        <input type="email" id="f-email" data-i18n-ph="ph.email" placeholder="发送预约确认">
+      </div>
+      <div class="field">
+        <label data-i18n="field.location">拍摄地点 / Location *</label>
+        <input type="text" id="f-location" data-i18n-ph="ph.location" placeholder="详细地址或邮编">
+        <div class="loc-hint" id="loc-hint"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="field.notes">拍摄说明 / Notes</label>
+        <textarea id="f-notes" data-i18n-ph="ph.notes" placeholder="想拍的风格、场地偏好、特殊需求等..."></textarea>
+      </div>
+    </div>
+
+```
+<div class="datetime-block">
+  <h3 data-i18n="dt.title">选择时间</h3>
+  <div class="sub" data-i18n="dt.sub">Pick a Date & Time</div>
+  <div class="calendar-header">
+    <div class="cal-month" id="cal-month-label"></div>
+    <div class="cal-nav">
+      <button id="cal-prev">‹</button>
+      <button id="cal-next">›</button>
+    </div>
+  </div>
+  <div class="calendar" id="calendar"></div>
+  <div class="sub" data-i18n="dt.slots" style="margin-top:4px;">Time Slots</div>
+  <div class="timeslots" id="timeslots"></div>
+</div>
+```
+
+  </div>
+
+  <div class="submit-row">
+    <div class="summary" id="summary" data-i18n="summary.empty">请完成上方信息</div>
+    <button class="btn-submit" id="btn-submit" disabled><span data-i18n="btn.submit">确认预约 · Confirm</span></button>
+  </div>
+</div>
+
+<!-- 成功页 -->
+
+<div id="view-success" class="hidden">
+  <div class="success">
+    <div class="mark">yolo ✦</div>
+    <h2 data-i18n-html="success.title">预约<em>已收到</em></h2>
+    <p data-i18n-html="success.body">感谢你的信任。请<strong style="color:var(--rust);">添加摄影师联系方式</strong>,<br>支付半价定金后档期方为锁定。</p>
+    <div class="details" id="success-details"></div>
+    <div class="deposit-notice">
+      <div class="deposit-title" data-i18n="deposit.title">⚠ 重要 · Deposit Required</div>
+      <div class="deposit-body" data-i18n-html="deposit.body">预付 <strong>半价定金</strong> 视为合同生效,档期才正式锁定<br>请添加下方联系方式与摄影师确认细节</div>
+    </div>
+    <div class="deposit-notice hidden" id="email-fallback-notice" style="border-color:#b8862a;background:rgba(184,134,42,0.06);">
+      <div class="deposit-title" style="color:#b8862a;" data-i18n="email.fail.title">⚠ 网络不佳 · 请主动联系摄影师</div>
+      <div class="deposit-body" data-i18n-html="email.fail.body">系统未能成功通知摄影师,<strong>请务必通过下方微信或 WhatsApp 直接联系</strong>,以免遗漏您的预约。</div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-head">
+        <div class="contact-tag">Contact</div>
+        <div class="contact-name" data-i18n="contact.name">摄影师 · Nicklaus</div>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <div class="contact-label" data-i18n="contact.wechat">微信 / WeChat</div>
+          <div class="contact-value">Mr_Nicklaus</div>
+          <button class="contact-copy" data-copy="Mr_Nicklaus" data-i18n="btn.copy">复制</button>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">WhatsApp</div>
+          <div class="contact-value">+1 (929) 760-6777</div>
+          <button class="contact-copy" data-copy="9297606777" data-i18n="btn.copy">复制</button>
+        </div>
+      </div>
+      <a href="https://wa.me/19297606777" target="_blank" class="contact-cta">
+        <span data-i18n="btn.whatsapp">打开 WhatsApp 联系 →</span>
+      </a>
+    </div>
+    <button class="btn-submit" id="btn-back" style="margin-top:24px;"><span data-i18n="btn.back">返回 / Back</span></button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<button class="music-fab" id="music-fab" aria-label="Toggle background music">
+  <span class="music-tooltip" id="music-tooltip" data-i18n="music.tooltip">来点轻音乐?</span>
+  <span class="music-icon">
+    <span></span><span></span><span></span><span></span>
+  </span>
+</button>
+<audio id="bgm" loop preload="none"></audio>
+
+<script>
+// ========== i18n ==========
+const I18N = {
+  zh: {
+    'brand.cn': 'LA同城约拍',
+    'hero.title': 'LA同城约拍',
+    'hero.poem': '<span class="line">我不只是按下快门</span><span class="line">更在意那些藏在细节里的情绪</span><span class="line">一个不经意的眼神,一句轻声的笑</span><span class="line">让每一个值得被记住的瞬间</span><span class="line">在照片里永远鲜活</span>',
+    'divider.equipment': 'Equipment · 拍照设备',
+    'divider.packages': 'Packages · 套餐',
+    'divider.reserve': 'Reserve · 预约信息',
+    'equip.title': '设备:<span class="model">富士 XT-5</span>',
+    'equip.list': '<li>最大程度还原自然色彩</li><li>富士滤镜直出</li><li>擅长自然感、复古风、小清新</li><li>人像拍摄</li><li>原厂 4800 万像素 33mm 中画幅镜头</li><li>18-50mm 变焦镜头,轻松驾驭各种场景</li>',
+    'pricelist.subtitle.portrait': '约拍套餐',
+    'pricelist.subtitle.wedding': '婚礼跟拍套餐',
+    'tab.portrait': '约拍套餐 / Portrait',
+    'tab.wedding': '婚礼跟拍 / Wedding',
+    'notes': '<span class="star">注 ☆☆☆</span>前两档价格不包含车费,客人需承担额外车费<br>拍摄结束后 7 天左右精修完毕<br>预付半价定金视为合同生效<br>取消预约请提前一周',
+    'field.name': '姓名 / Name *',
+    'field.phone': '电话 / Phone *',
+    'field.email': '邮箱 / Email *',
+    'field.location': '拍摄地点 / Location *',
+    'field.notes': '拍摄说明 / Notes',
+    'ph.name': '您的称呼',
+    'ph.phone': '便于我们联系您',
+    'ph.email': '发送预约确认',
+    'ph.location': '详细地址或邮编 (如 91748 / Griffith Park)',
+    'ph.notes': '想拍的风格、场地偏好、特殊需求等...',
+    'dt.title': '选择时间',
+    'dt.sub': 'Pick a Date & Time',
+    'dt.slots': 'Time Slots',
+    'summary.empty': '请完成上方信息',
+    'summary.missing.pkg': '套餐',
+    'summary.missing.date': '日期',
+    'summary.missing.time': '时间',
+    'summary.missing.info': '信息',
+    'summary.missing.loc': '地点',
+    'summary.missing.prefix': '请完成 ',
+    'btn.submit': '确认预约 · Confirm',
+    'btn.back': '返回 / Back',
+    'btn.copy': '复制',
+    'btn.copied': '已复制 ✓',
+    'btn.whatsapp': '打开 WhatsApp 联系 →',
+    'success.title': '预约<em>已收到</em>',
+    'success.body': '感谢你的信任。请<strong style="color: var(--rust);">添加摄影师联系方式</strong>,<br>支付半价定金后档期方为锁定。',
+    'deposit.title': '⚠ 重要 · Deposit Required',
+    'deposit.body': '预付 <strong>半价定金</strong> 视为合同生效,档期才正式锁定<br>请添加下方联系方式与摄影师确认细节',
+    'email.fail.title': '⚠ 网络不佳 · 请主动联系摄影师',
+    'email.fail.body': '系统未能成功通知摄影师,<strong>请务必通过下方微信或 WhatsApp 直接联系</strong>,以免遗漏您的预约。',
+    'contact.name': '摄影师 · Nicklaus',
+    'contact.wechat': '微信 / WeChat',
+    'time.starts': '起',
+    'time.indoor': '室内佳',
+    'loc.checking': '识别中...',
+    'loc.recognized': '已识别',
+    'toast.fail': '提交失败,请重试',
+    'cal.dow': ['日','一','二','三','四','五','六'],
+    'music.tooltip': '来点轻音乐 ?',
+    'music.fail': '音乐加载失败'
+  },
+  en: {
+    'brand.cn': 'LA Photoshoot',
+    'hero.title': 'LA Photoshoot',
+    'hero.poem': '<span class="line">More than just pressing the shutter</span><span class="line">It\'s about emotion hidden in the smallest details</span><span class="line">A glance, a quiet laugh, a fleeting moment</span><span class="line">All worth remembering</span><span class="line">forever alive in your photographs</span>',
+    'divider.equipment': 'Equipment',
+    'divider.packages': 'Packages',
+    'divider.reserve': 'Reserve',
+    'equip.title': 'Camera: <span class="model">Fujifilm XT-5</span>',
+    'equip.list': '<li>True-to-life natural color rendering</li><li>Fujifilm film simulation SOOC</li><li>Natural, vintage, light-and-airy styles</li><li>Portrait photography</li><li>40MP APS-C sensor with 33mm prime lens</li><li>18-50mm zoom for any scene</li>',
+    'pricelist.subtitle.portrait': 'Portrait Packages',
+    'pricelist.subtitle.wedding': 'Wedding Packages',
+    'tab.portrait': 'Portrait',
+    'tab.wedding': 'Wedding',
+    'notes': '<span class="star">Note ☆☆☆</span>First two tiers do not include travel fee<br>Retouching delivered in ~7 days after shoot<br>50% deposit confirms the booking<br>Please cancel at least 1 week in advance',
+    'field.name': 'Name *',
+    'field.phone': 'Phone *',
+    'field.email': 'Email *',
+    'field.location': 'Shoot Location *',
+    'field.notes': 'Notes',
+    'ph.name': 'How should we address you',
+    'ph.phone': 'For confirmation',
+    'ph.email': 'Booking confirmation sent here',
+    'ph.location': 'Address or ZIP (e.g. 91748 / Griffith Park)',
+    'ph.notes': 'Style preferences, venue ideas, special requests...',
+    'dt.title': 'Date & Time',
+    'dt.sub': 'Pick a Date & Time',
+    'dt.slots': 'Time Slots',
+    'summary.empty': 'Please complete the form above',
+    'summary.missing.pkg': 'package',
+    'summary.missing.date': 'date',
+    'summary.missing.time': 'time',
+    'summary.missing.info': 'info',
+    'summary.missing.loc': 'location',
+    'summary.missing.prefix': 'Please fill in ',
+    'btn.submit': 'Confirm Booking',
+    'btn.back': 'Back',
+    'btn.copy': 'Copy',
+    'btn.copied': 'Copied ✓',
+    'btn.whatsapp': 'Open WhatsApp →',
+    'success.title': 'Booking <em>Received</em>',
+    'success.body': 'Thank you for booking. Please <strong style="color: var(--rust);">add the photographer\'s contact</strong>,<br>and pay the 50% deposit to lock your slot.',
+    'deposit.title': '⚠ Important · Deposit Required',
+    'deposit.body': 'A <strong>50% deposit</strong> is required to lock your booking.<br>Please reach out via the contact below.',
+    'email.fail.title': '⚠ Network Issue · Please Contact Photographer',
+    'email.fail.body': 'We could not notify the photographer. <strong>Please reach out via WeChat or WhatsApp below.</strong>',
+    'contact.name': 'Photographer · Nicklaus',
+    'contact.wechat': 'WeChat',
+    'time.starts': 'start',
+    'time.indoor': 'indoor',
+    'loc.checking': 'Checking...',
+    'loc.recognized': 'Recognized',
+    'toast.fail': 'Submission failed, please try again',
+    'cal.dow': ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    'music.tooltip': 'Some lo-fi?',
+    'music.fail': 'Music failed to load'
+  }
+};
+
+const i18n = {
+  lang: 'zh',
+  t(key) { return (I18N[this.lang] && I18N[this.lang][key]) || (I18N.zh[key]) || key; },
+  apply() {
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = this.t(el.getAttribute('data-i18n')); });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = this.t(el.getAttribute('data-i18n-html')); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = this.t(el.getAttribute('data-i18n-ph')); });
+  }
+};
+
+function initLanguage() {
+  const saved = localStorage.getItem('yolo_lang');
+  if (saved === 'zh' || saved === 'en') {
+    i18n.lang = saved;
+    i18n.apply();
+    const splash = document.getElementById('lang-splash');
+    if (splash) splash.remove();
+    return;
+  }
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      i18n.lang = btn.dataset.lang;
+      localStorage.setItem('yolo_lang', i18n.lang);
+      i18n.apply();
+      const splash = document.getElementById('lang-splash');
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 500);
+      renderPackages(); renderCalendar(); renderTimeslots(); updateSummary();
+    });
+  });
+}
+
+// ========== 套餐数据 ==========
+const PACKAGES = {
+  portrait: [
+    { id:'p1', name:'速拍纯享版', nameEn:'Quick Shoot', duration:'1hr', priceSingle:99, priceDouble:199, hasDouble:true,
+      features:['9 张精修图,底片全送(150+)','当日可得底片','挑选后 3 日内精修完毕'],
+      featuresEn:['9 retouched + all RAW (150+)','RAW delivered same day','Retouching within 3 days of selection'] },
+    { id:'p2', name:'深度精享版', nameEn:'Deep Dive', duration:'3hr', priceSingle:299, priceDouble:599, hasDouble:true,
+      features:['35 张精修图,底片全送(300+)','赠修眉,可代购手工花束','当日可得精修 9 张,其余挑选后 5 天内精修完毕','可选双场地拍摄'],
+      featuresEn:['35 retouched + all RAW (300+)','Brow grooming included, bouquet by request','9 retouched same day, rest within 5 days','Optional 2 locations'] },
+    { id:'p3', name:'全天尊享版', nameEn:'Full Day Premium', duration:'8hr', priceSingle:599, priceDouble:1199, hasDouble:true,
+      features:['120 张精修图,底片全送(900+)','美甲/花束/男士剪发任选其一','当日精修 9 张 + 3 分钟微电影','LA 全城任选','赠实体精装手工相册一本'],
+      featuresEn:['120 retouched + all RAW (900+)','Choose: manicure / bouquet / haircut','9 retouched same day + 3-min mini film','Anywhere in LA','Premium handcrafted photo album'] }
+  ],
+  wedding: [
+    { id:'w1', name:'速拍纯享版', nameEn:'Quick Shoot', duration:'1hr', priceSingle:199, hasDouble:false,
+      features:['12 张精修图,底片全送(200+)','当日可得底片','挑选后 3 日内精修完毕'],
+      featuresEn:['12 retouched + all RAW (200+)','RAW delivered same day','Retouching within 3 days'] },
+    { id:'w2', name:'双景精享版', nameEn:'Two Locations', duration:'3hr', priceSingle:599, hasDouble:false,
+      features:['45 张精修图,底片全送(500+)','赠修眉,可代购手工花束','当日精修 9 张,其余 5 天内完毕','双场地全程记录'],
+      featuresEn:['45 retouched + all RAW (500+)','Brow grooming included, bouquet by request','9 retouched same day, rest within 5 days','2 locations full coverage'] },
+    { id:'w3', name:'全天尊享版', nameEn:'Full Day Premium', duration:'24hr', priceSingle:1799, hasDouble:false,
+      features:['150 张精修图,底片全送(1500+)','赠美甲+修眉+花束+男士剪发','当日精修 9 张 + 3 分钟微电影','LA 全城任选','婚前一晚起纪实录制,赠精装相册'],
+      featuresEn:['150 retouched + all RAW (1500+)','Manicure + brow + bouquet + haircut all included','9 retouched same day + 3-min mini film','Anywhere in LA','Documentary starts the night before · album included'] }
+  ]
+};
+
+let state = { category:'portrait', selectedPkg:null, personType:'single', selectedDate:null, selectedTime:null, calMonth:new Date().getMonth(), calYear:new Date().getFullYear() };
+
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + new Intl.NumberFormat('en-US').format(n);
+const pad = n => String(n).padStart(2,'0');
+const dateKey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function findPackage(id) {
+  for (const cat in PACKAGES) { const p = PACKAGES[cat].find(x => x.id === id); if (p) return { ...p, category:cat }; }
+  return null;
+}
+
+function renderPackages() {
+  const list = PACKAGES[state.category];
+  $('price-subtitle').textContent = state.category === 'wedding' ? i18n.t('pricelist.subtitle.wedding') : i18n.t('pricelist.subtitle.portrait');
+  const soloLbl = i18n.lang === 'en' ? 'Solo' : '单人';
+  const duoLbl = i18n.lang === 'en' ? 'Duo' : '双人';
+
+  $('packages-list').innerHTML = list.map(p => {
+    const isSel = state.selectedPkg === p.id;
+    const displayName = i18n.lang === 'en' ? (p.nameEn || p.name) : p.name;
+    const displayFeatures = i18n.lang === 'en' ? (p.featuresEn || p.features) : p.features;
+    const personHtml = p.hasDouble ? `
+      <div class="person-toggle" onclick="event.stopPropagation()">
+        <button data-pt="single" class="${isSel && state.personType==='single' ? 'active' : (!isSel ? 'active' : '')}" data-pkg="${p.id}">${soloLbl}</button>
+        <button data-pt="double" class="${isSel && state.personType==='double' ? 'active' : ''}" data-pkg="${p.id}">${duoLbl}</button>
+      </div>` : '';
+    return `<div class="package ${isSel?'selected':''}" data-id="${p.id}">
+      <div class="package-row">
+        <div class="package-name"><span class="duration">${p.duration}</span>${displayName}</div>
+        <div class="package-price"><span class="single">${fmt(p.priceSingle)}</span>${p.hasDouble?`<span class="double">${duoLbl} ${fmt(p.priceDouble)}</span>`:''}</div>
+      </div>
+      <ul class="package-features">${displayFeatures.map(f=>`<li>${f}</li>`).join('')}</ul>
+      ${personHtml}
+    </div>`;
+  }).join('');
+
+  $('packages-list').querySelectorAll('.package').forEach(el => {
+    el.addEventListener('click', () => {
+      state.selectedPkg = el.dataset.id;
+      const pkg = findPackage(el.dataset.id);
+      if (!pkg.hasDouble) state.personType = 'single';
+      renderPackages(); updateSummary();
+    });
+  });
+  $('packages-list').querySelectorAll('.person-toggle button').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      state.selectedPkg = btn.dataset.pkg; state.personType = btn.dataset.pt;
+      renderPackages(); updateSummary();
+    });
+  });
+}
+
+document.querySelectorAll('.package-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.package-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.category = tab.dataset.cat; state.selectedPkg = null;
+    renderPackages(); updateSummary();
+  });
+});
+
+// ========== 日历 ==========
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderCalendar() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  $('cal-month-label').textContent = `${MONTH_NAMES[state.calMonth]} ${state.calYear}`;
+  const dow = i18n.t('cal.dow');
+  let html = dow.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const first = new Date(state.calYear, state.calMonth, 1);
+  const last = new Date(state.calYear, state.calMonth+1, 0);
+  for (let i=0; i<first.getDay(); i++) html += `<div class="cal-day disabled"></div>`;
+  for (let d=1; d<=last.getDate(); d++) {
+    const date = new Date(state.calYear, state.calMonth, d);
+    const isPast = date < today;
+    const isToday = date.getTime() === today.getTime();
+    const isSelected = state.selectedDate && dateKey(date) === state.selectedDate;
+    let cls = 'cal-day';
+    if (isPast) cls += ' disabled';
+    if (isToday) cls += ' today';
+    if (isSelected) cls += ' selected';
+    html += `<div class="${cls}" data-date="${dateKey(date)}">${d}</div>`;
+  }
+  $('calendar').innerHTML = html;
+  $('calendar').querySelectorAll('.cal-day:not(.disabled)').forEach(el => {
+    if (!el.dataset.date) return;
+    el.addEventListener('click', () => {
+      state.selectedDate = el.dataset.date; state.selectedTime = null;
+      renderCalendar(); renderTimeslots(); updateSummary();
+    });
+  });
+}
+
+const TIME_SLOTS = ['08:00','10:00','12:00','14:00','16:00','18:00'];
+const INDOOR_BEST = ['12:00','14:00'];
+
+function renderTimeslots() {
+  const pkg = findPackage(state.selectedPkg);
+  const is3hr = pkg && pkg.duration === '3hr';
+  const is8hr = pkg && pkg.duration === '8hr';
+  const is24hr = pkg && pkg.duration === '24hr';
+  $('timeslots').innerHTML = TIME_SLOTS.map(t => {
+    let cls = 'timeslot', label = t, extra = '', disabled = false;
+    if (is3hr) { const [h] = t.split(':').map(Number); label = `${t}–${String(h+3).padStart(2,'0')}:00`; }
+    else if (is8hr) { const [h] = t.split(':').map(Number); label = `${t}–${String(Math.min(h+8,20)).padStart(2,'0')}:00`; if (h>12) disabled=true; }
+    else if (is24hr) { label = `${t} ${i18n.t('time.starts')}`; }
+    if (INDOOR_BEST.includes(t)) { cls += ' indoor-best'; extra = `<span class="indoor-tag">${i18n.t('time.indoor')}</span>`; }
+    if (state.selectedTime === t) cls += ' selected';
+    return `<button class="${cls}" data-time="${t}" ${disabled?'disabled':''}>${label}${extra}</button>`;
+  }).join('');
+  $('timeslots').querySelectorAll('.timeslot').forEach(el => {
+    if (el.disabled) return;
+    el.addEventListener('click', () => { state.selectedTime = el.dataset.time; renderTimeslots(); updateSummary(); });
+  });
+}
+
+// ========== 地址识别 ==========
+const geocodeCache = new Map();
+let locationDebounce = null;
+
+async function geocodeAddress(text) {
+  const key = text.trim().toLowerCase();
+  if (geocodeCache.has(key)) return geocodeCache.get(key);
+  let query = text.trim();
+  if (!/california|\bca\b|usa/i.test(query)) query += ', California, USA';
+  const providers = [
+    () => fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=us`).then(r=>r.json()).then(d=>d[0]?{lat:parseFloat(d[0].lat),displayName:d[0].display_name}:null),
+    () => fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1&lang=en`).then(r=>r.json()).then(d=>{if(!d.features||!d.features.length)return null;const f=d.features[0];return{lat:f.geometry.coordinates[1],displayName:f.properties.name||query};})
+  ];
+  for (const fn of providers) {
+    try { const r = await fn(); if(r){geocodeCache.set(key,r);return r;} } catch {}
+  }
+  geocodeCache.set(key,null); return null;
+}
+
+function onLocationInput() {
+  const loc = $('f-location').value.trim();
+  const hint = $('loc-hint');
+  if (!loc) { hint.className='loc-hint'; hint.textContent=''; updateSummary(); return; }
+  hint.className='loc-hint'; hint.textContent=i18n.t('loc.checking');
+  if (locationDebounce) clearTimeout(locationDebounce);
+  locationDebounce = setTimeout(async () => {
+    const geo = await geocodeAddress(loc);
+    if (geo) { const short = geo.displayName.split(',').slice(0,3).join(',').trim(); hint.className='loc-hint ok'; hint.innerHTML=`📍 ${i18n.t('loc.recognized')} · ${short}`; }
+    else { hint.className='loc-hint'; hint.textContent=''; }
+    updateSummary();
+  }, 600);
+}
+
+// ========== 摘要 & 提交 ==========
+function getCurrentPrice() {
+  const pkg = findPackage(state.selectedPkg);
+  if (!pkg) return 0;
+  return state.personType==='double' && pkg.hasDouble ? pkg.priceDouble : pkg.priceSingle;
+}
+
+function updateSummary() {
+  const name=$('f-name').value.trim(), phone=$('f-phone').value.trim(), email=$('f-email').value.trim(), location=$('f-location').value.trim();
+  const pkg = findPackage(state.selectedPkg);
+  const ready = name && phone && email && location && pkg && state.selectedDate && state.selectedTime;
+  if (ready) {
+    const price = getCurrentPrice();
+    const personLabel = pkg.hasDouble ? (state.personType==='double'?(i18n.lang==='en'?'Duo':'双人'):(i18n.lang==='en'?'Solo':'单人')) : '';
+    $('summary').innerHTML = `<strong>${pkg.duration} ${pkg.name}</strong> ${personLabel?'· '+personLabel:''} · ${state.selectedDate} ${state.selectedTime} · ${fmt(price)}`;
+    $('btn-submit').disabled = false;
+  } else {
+    const missing=[];
+    if(!pkg) missing.push(i18n.t('summary.missing.pkg'));
+    if(!state.selectedDate) missing.push(i18n.t('summary.missing.date'));
+    if(!state.selectedTime) missing.push(i18n.t('summary.missing.time'));
+    if(!name||!phone||!email) missing.push(i18n.t('summary.missing.info'));
+    if(!location) missing.push(i18n.t('summary.missing.loc'));
+    $('summary').textContent = i18n.t('summary.missing.prefix') + missing.join(' / ');
+    $('btn-submit').disabled = true;
+  }
+}
+
+const FORMSPREE_ID = 'xdabeewd';
+
+async function sendEmail(booking) {
+  if (!FORMSPREE_ID) return { ok:false };
+  const payload = {
+    _subject: `🎬 新预约 · ${booking.name} · ${booking.date} ${booking.time}`,
+    '客户': booking.name, '电话': booking.phone, '邮箱': booking.email,
+    '套餐': `${booking.duration} ${booking.packageName}`, '人数': booking.personType,
+    '日期': booking.date, '时间': booking.time, '地点': booking.location,
+    '说明': booking.notes||'(无)', '金额': fmt(booking.price)
+  };
+  try {
+    const r = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    return { ok: r.ok };
+  } catch { return { ok:false }; }
+}
+
+function escapeHtml(s) {
+  if(!s)return'';
+  return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function submitBooking() {
+  const pkg = findPackage(state.selectedPkg);
+  const price = getCurrentPrice();
+  const personLabel = pkg.hasDouble ? (state.personType==='double'?(i18n.lang==='en'?'Duo':'双人'):(i18n.lang==='en'?'Solo':'单人')) : '—';
+  const booking = {
+    id: 'bk_'+Date.now(),
+    name: $('f-name').value.trim(), phone: $('f-phone').value.trim(),
+    email: $('f-email').value.trim(), location: $('f-location').value.trim(),
+    notes: $('f-notes').value.trim(),
+    categoryLabel: pkg.category==='wedding'?(i18n.lang==='en'?'Wedding':'婚礼跟拍'):(i18n.lang==='en'?'Portrait':'约拍'),
+    packageName: pkg.name, duration: pkg.duration, personType: personLabel,
+    price, date: state.selectedDate, time: state.selectedTime
+  };
+  $('btn-submit').disabled = true;
+  let emailOk = true;
+  try { const r = await sendEmail(booking); emailOk = r.ok; } catch { emailOk = false; }
+
+  $('view-customer').classList.add('hidden');
+  $('view-success').classList.remove('hidden');
+  if (!emailOk) { const n=$('email-fallback-notice'); if(n) n.classList.remove('hidden'); }
+
+  const L = { zh:{cat:'类别',pkg:'套餐',person:'人数',date:'日期',time:'时间',loc:'地点',price:'金额'}, en:{cat:'Type',pkg:'Package',person:'Persons',date:'Date',time:'Time',loc:'Location',price:'Price'} }[i18n.lang];
+  $('success-details').innerHTML = `
+    <div class="row"><span>${L.cat}</span><span>${booking.categoryLabel}</span></div>
+    <div class="row"><span>${L.pkg}</span><span>${booking.duration} ${booking.packageName}</span></div>
+    ${booking.personType!=='—'?`<div class="row"><span>${L.person}</span><span>${booking.personType}</span></div>`:''}
+    <div class="row"><span>${L.date}</span><span>${booking.date}</span></div>
+    <div class="row"><span>${L.time}</span><span>${booking.time}</span></div>
+    <div class="row"><span>${L.loc}</span><span style="max-width:240px;text-align:right;word-break:break-word;">${escapeHtml(booking.location)}</span></div>
+    <div class="row"><span>${L.price}</span><span style="color:var(--rust);font-weight:600;">${fmt(booking.price)}</span></div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetForm() {
+  state.selectedPkg=null; state.selectedDate=null; state.selectedTime=null; state.personType='single';
+  ['f-name','f-phone','f-email','f-location','f-notes'].forEach(id => $(id).value='');
+  $('loc-hint').className='loc-hint'; $('loc-hint').textContent='';
+  const fb=$('email-fallback-notice'); if(fb) fb.classList.add('hidden');
+  renderPackages(); renderCalendar(); renderTimeslots(); updateSummary();
+  $('view-success').classList.add('hidden'); $('view-customer').classList.remove('hidden');
+}
+
+// 事件绑定
+$('cal-prev').addEventListener('click',()=>{ state.calMonth--; if(state.calMonth<0){state.calMonth=11;state.calYear--;} renderCalendar(); });
+$('cal-next').addEventListener('click',()=>{ state.calMonth++; if(state.calMonth>11){state.calMonth=0;state.calYear++;} renderCalendar(); });
+['f-name','f-phone','f-email'].forEach(id => $(id).addEventListener('input',updateSummary));
+$('f-location').addEventListener('input', onLocationInput);
+$('btn-submit').addEventListener('click', submitBooking);
+$('btn-back').addEventListener('click', resetForm);
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.contact-copy'); if(!btn) return;
+  const text = btn.dataset.copy;
+  navigator.clipboard?.writeText(text).then(()=>{ btn.textContent=i18n.t('btn.copied'); btn.classList.add('copied'); setTimeout(()=>{ btn.textContent=i18n.t('btn.copy'); btn.classList.remove('copied'); },1800); });
+});
+
+// ========== 背景音乐 ==========
+const BGM_SOURCES = [
+  './bgm.mp3',
+  'https://cdn.pixabay.com/audio/2024/04/14/audio_a18a23a31a.mp3',
+  'https://cdn.pixabay.com/audio/2023/05/19/audio_5853db5cb1.mp3'
+];
+
+const audio = $('bgm');
+const fab = $('music-fab');
+let bgmReady = false;
+
+async function initMusic() {
+  for (const src of BGM_SOURCES) {
+    const ok = await new Promise(resolve => {
+      const a = new Audio();
+      const t = setTimeout(()=>resolve(false), 4000);
+      a.addEventListener('canplay',()=>{clearTimeout(t);resolve(true)},{once:true});
+      a.addEventListener('error',()=>{clearTimeout(t);resolve(false)},{once:true});
+      a.preload='metadata'; a.src=src;
+    });
+    if (ok) { audio.src=src; audio.volume=0.4; bgmReady=true;
+      setTimeout(()=>{ if(audio.paused){ fab.classList.add('show-tooltip'); setTimeout(()=>fab.classList.remove('show-tooltip'),3500); }}, 1500);
+      return;
+    }
+  }
+  fab.style.display='none';
+}
+
+fab.addEventListener('click', async () => {
+  fab.classList.remove('show-tooltip');
+  if (!bgmReady) { await initMusic(); if(!bgmReady){toast(i18n.t('music.fail'));return;} }
+  if (audio.paused) {
+    try {
+      await audio.play(); fab.classList.add('playing');
+      audio.volume=0; let v=0;
+      const fi=setInterval(()=>{ v=Math.min(v+0.04,0.4); audio.volume=v; if(v>=0.4)clearInterval(fi); },80);
+    } catch { toast(i18n.t('music.fail')); }
+  } else {
+    let v=audio.volume;
+    const fo=setInterval(()=>{ v=Math.max(v-0.04,0); audio.volume=v; if(v<=0){clearInterval(fo);audio.pause();fab.classList.remove('playing');} },60);
+  }
+});
+
+setTimeout(initMusic, 1500);
+
+// ========== 初始化 ==========
+initLanguage();
+i18n.apply();
+renderPackages();
+renderCalendar();
+renderTimeslots();
+updateSummary();
+</script>
+
+</body>
+</html>
